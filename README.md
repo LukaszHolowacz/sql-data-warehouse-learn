@@ -63,10 +63,10 @@ flowchart LR
 ├── datasets/               # Surowe pliki źródłowe (lub skrypty pobierające)
 ├── docs/                   # Diagramy ERD, słownik danych
 ├── scripts/
-│   ├── 01_init_database.sql    # Inicjalizacja bazy i schematów (bronze, silver, gold)
-│   ├── 02_bronze/              # DDL tabel surowych oraz procedury ładowania
-│   ├── 03_silver/              # Transformacje, czyszczenie i procedury Silver
-│   └── 04_gold/                # Tabele/widoki wymiarowe i faktów (Star Schema)
+│   ├── init_database.sql    # Inicjalizacja bazy i schematów (bronze, silver, gold)
+│   ├── bronze/              # DDL tabel surowych oraz procedury ładowania
+│   ├── silver/              # Transformacje, czyszczenie i procedury Silver
+│   └── gold/                # Tabele/widoki wymiarowe i faktów (Star Schema)
 ├── tests/                  # Zapytania sprawdzające jakość danych (Data Quality checks)
 ├── .env.example            # Szablon zmiennych środowiskowych (bez haseł)
 ├── .gitignore
