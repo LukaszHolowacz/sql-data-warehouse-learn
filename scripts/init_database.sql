@@ -16,7 +16,11 @@ Warning!! (PostgreSQL):
 DROP DATABASE IF EXISTS data_warehouse WITH (FORCE);
 CREATE DATABASE data_warehouse;
 
+--If you are using PgAdmin or other GUI comment this line and manually select database created in part 1.
+\c data_warehouse
+
 --Part 2: Lunch from 'data_warehouse' database
+--Creating medallion schemas
 CREATE SCHEMA IF NOT EXISTS bronze;
 CREATE SCHEMA IF NOT EXISTS silver;
 CREATE SCHEMA IF NOT EXISTS gold;
