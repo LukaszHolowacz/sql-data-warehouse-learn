@@ -40,7 +40,7 @@ flowchart LR
 | Obszar | Technologia | Zastosowanie w projekcie |
 | :--- | :--- | :--- |
 | **🗄️ Baza danych** | PostgreSQL 19 | Przechowywanie warstw `bronze`, `silver`, `gold` oraz logika ETL |
-| **🖥️ Klient SQL** | pgAdmin 4 | Administracja bazą, import danych źródłowych, wykonywanie skryptów |
+| **💻 Narzędzia SQL** | `psql` (CLI) & pgAdmin 4 | Uruchamianie skryptów z terminala oraz podgląd i administracja bazą |
 | **📐 Modelowanie** | Medallion + Star Schema | Separacja surowych danych od tabel faktów i wymiarów |
 | **🔀 Kontrola wersji** | Git & GitHub | Wersjonowanie skryptów DDL/DML i dokumentacji |
 
@@ -49,7 +49,7 @@ flowchart LR
 ## 🏛️ 4. Opis warstw i model danych
 
 ### 🟤 Warstwa Bronze (Raw)
-* Przechowuje surowe dane **1:1** dokładnie w takiej postaci, w jakiej przyszły ze źródła (`TRUNCATE` + pełny załadunek).
+* Przechowyuje surowe dane **1:1** dokładnie w takiej postaci, w jakiej przyszły ze źródła (`TRUNCATE` + pełny załadunek).
 * Brak transformacji biznesowych — służy jako punkt odniesienia i audytu.
 
 ### ⚪ Warstwa Silver (Cleansed & Conformed)
@@ -76,10 +76,10 @@ flowchart LR
 ├── 📦 datasets/                # Surowe pliki źródłowe (lub skrypty pobierające)
 ├── 📐 docs/                    # Diagramy ERD, słownik danych
 ├── 📜 scripts/
-│   ├── 01_init_database.sql    # Inicjalizacja bazy i schematów (bronze, silver, gold)
-│   ├── 02_bronze/              # DDL tabel surowych oraz procedury ładowania
-│   ├── 03_silver/              # Transformacje, czyszczenie i procedury Silver
-│   └── 04_gold/                # Tabele/widoki wymiarowe i faktów (Star Schema)
+│   ├── init_database.sql       # Inicjalizacja bazy i schematów (bronze, silver, gold)
+│   ├── bronze/                 # DDL tabel surowych oraz procedury ładowania
+│   ├── silver/                 # Transformacje, czyszczenie i procedury Silver
+│   └── gold/                   # Tabele/widoki wymiarowe i faktów (Star Schema)
 ├── 🧪 tests/                   # Zapytania sprawdzające jakość danych (Data Quality)
 ├── 🔐 .env.example             # Szablon zmiennych środowiskowych (bez haseł)
 ├── 🙈 .gitignore
@@ -88,29 +88,40 @@ flowchart LR
 
 ---
 
-## 🚀 7. Jak uruchomić projekt lokalnie
+## 🚀 7. Jak uruchomić projekt
 
 1. **Sklonuj repozytorium:**
    ```bash
    git clone [https://github.com/twoj-nick/nazwa-repozytorium.git](https://github.com/twoj-nick/nazwa-repozytorium.git)
    cd nazwa-repozytorium
    ```
-2. **Zainicjuj bazę danych:**
-   * Uruchom lokalny serwer PostgreSQL (np. przez Postgres.app).
-   * Wykonaj sekcję 1 pliku `scripts/01_init_database.sql` z poziomu bazy `postgres`, a następnie sekcję 2 wewnątrz bazy `data_warehouse`.
+
+2. **Zainicjuj bazę danych i schematy (`psql`):**
+   Skrypt `scripts/init_database.sql` jest przygotowany pod klienta terminalowego `psql` (wykorzystuje komendę `\c data_warehouse` do automatycznego przełączenia bazy):
+   ```bash
+   # macOS (Postgres.app / Homebrew)
+   psql -d postgres -v ON_ERROR_STOP=1 -f scripts/init_database.sql
+
+   # Linux / Ubuntu Server
+   sudo -u postgres psql -v ON_ERROR_STOP=1 -f scripts/init_database.sql
+   ```
 
 > [!NOTE]
-> PostgreSQL nie obsługuje polecenia `USE` znanego z MS SQL Servera — przed uruchomieniem sekcji 2 upewnij się, że otworzyłeś **Query Tool** bezpośrednio na bazie `data_warehouse`.
+> **Uruchamianie w GUI (np. pgAdmin 4):** Narzędzia graficzne nie obsługują terminalowej komendy `\c`. Jeśli uruchamiasz skrypt z poziomu pgAdmina, zakomentuj linię `-- \c data_warehouse`, wykonaj **Part 1** na bazie `postgres`, a następnie otwórz **Query Tool** na nowo utworzonej bazie `data_warehouse` i wykonaj **Part 2**.
 
 3. **Załaduj i przetwórz dane:**
-   * Uruchom kolejno skrypty z katalogów `02_bronze`, `03_silver` oraz `04_gold`.
+   ```bash
+   # Przykład wykonania kolejnych warstw przez psql
+   psql -d data_warehouse -v ON_ERROR_STOP=1 -f scripts/bronze/ddl_bronze.sql
+   ```
+
 4. **Zweryfikuj jakość danych:**
    * Odpal zapytania z folderu `tests/`, aby potwierdzić brak duplikatów i osieroconych kluczy w warstwie `gold`.
 
 ---
 
 ## 🗺️ 8. Planowany rozwój (Roadmap)
-* [x] Konfiguracja środowiska lokalnego PostgreSQL oraz architektury schematów Medallion.
+* [x] Konfiguracja środowiska PostgreSQL oraz architektury schematów Medallion (`scripts/init_database.sql`).
 * [ ] Implementacja tabel warstwy `bronze` oraz zasilenie danymi źródłowymi.
 * [ ] Budowa logiki czyszczenia i deduplikacji w warstwie `silver`.
 * [ ] Zamodelowanie schematu gwiazdy w warstwie `gold` i dodanie testów w `tests/`.
