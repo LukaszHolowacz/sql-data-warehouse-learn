@@ -3,7 +3,8 @@
 Inserting all data from CSV files to asigned tables.
 ===============================================================================
 Use:
-	Script will create procedure that copies all data to already created tables.
+	- Script will create procedure that copies all data to already created tables.
+	- Script mesure all queries execution time to make sure everything works correct and isn't too slow
 Warning:
 	Run this script after creating tables from init_tables.sql
 ===============================================================================
